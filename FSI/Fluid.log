@@ -1,0 +1,142 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 6
+Exec   : pimpleFoam -case Fluid
+Date   : May 09 2019
+Time   : 20:28:09
+Host   : "kubac-UX430UNR"
+PID    : 10995
+I/O    : uncollated
+Case   : ./Fluid
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+Selecting dynamicFvMesh dynamicMotionSolverFvMesh
+Selecting motion solver: displacementLaplacian
+Selecting motion diffusion: quadratic
+Selecting motion diffusion: inverseDistance
+
+PIMPLE: No convergence criteria found
+
+
+PIMPLE: Operating solver in PISO mode
+
+Reading field p
+
+Reading field U
+
+Reading/calculating face flux field phi
+
+Selecting incompressible transport model Newtonian
+Selecting turbulence model type laminar
+Selecting laminar stress model Stokes
+No MRF models present
+
+No finite volume options present
+Constructing face velocity Uf
+
+Courant Number mean: 1.17656 max: 11.1471
+
+Starting time loop
+
+---[preciceAdapter] The preciceAdapter was loaded.
+Registered objects: 
+26
+(
+solutionControl
+points
+neighbour
+faceDiffusivity
+MRFProperties
+pointMesh
+pointDisplacement
+faces
+U
+turbulenceProperties
+fvSchemes
+fvOptions
+faceZones
+fvSolution
+Uf
+nu
+phi
+owner
+data
+cellZones
+boundary
+dynamicMeshDict
+p
+cellDisplacement
+pointZones
+transportProperties
+)
+
+---[preciceAdapter] Reading the adapter's YAML configuration file ./Fluid/precice-adapter-config.yml...
+---[preciceAdapter] [DEBUG] Checking the adapter's YAML configuration file...
+---[preciceAdapter] [DEBUG]   participant : Fluid
+---[preciceAdapter] [DEBUG]   precice-config-file : precice-config.xml
+---[preciceAdapter] [DEBUG]   interfaces : 
+---[preciceAdapter] [DEBUG]   - mesh      : Fluid-Mesh-Faces
+---[preciceAdapter] [DEBUG]     locations : faceCenters
+---[preciceAdapter] [DEBUG]     patches   : 
+---[preciceAdapter] [DEBUG]       flap
+---[preciceAdapter] [DEBUG]     write-data : 
+---[preciceAdapter] [DEBUG]       Forces0
+---[preciceAdapter] [DEBUG]   - mesh      : Fluid-Mesh-Nodes
+---[preciceAdapter] [DEBUG]     locations : faceNodes
+---[preciceAdapter] [DEBUG]     patches   : 
+---[preciceAdapter] [DEBUG]       flap
+---[preciceAdapter] [DEBUG]     read-data : 
+---[preciceAdapter] [DEBUG]       Displacements0
+---[preciceAdapter] [DEBUG]     subcycling : 1
+---[preciceAdapter] [DEBUG]     prevent early exit : 1
+---[preciceAdapter] [DEBUG]     evaluate boundaries : 1
+---[preciceAdapter] [DEBUG]     disable checkpointing : 0
+---[preciceAdapter] [DEBUG]     CHT module enabled : 0
+---[preciceAdapter] [DEBUG]     FSI module enabled : 1
+---[preciceAdapter] [DEBUG] Configuring the FSI module...
+---[preciceAdapter] [DEBUG]     pointDisplacement field name : pointDisplacement
+---[preciceAdapter] [DEBUG] Checking the timestep type (fixed vs adjustable)...
+---[preciceAdapter] [DEBUG]   Timestep type: fixed.
+---[preciceAdapter] [DEBUG] Creating the preCICE solver interface...
+---[preciceAdapter] [DEBUG]   Number of processes: 1
+---[preciceAdapter] [DEBUG]   MPI rank: 0
+---[preciceAdapter] [DEBUG]   preCICE solver interface was created.
+---[preciceAdapter] [DEBUG] Configuring preCICE...
+(0) 20:28:12 [impl::SolverInterfaceImpl]:91 in configure: [0mThis is preCICE version 1.4.1
+(0) 20:28:12 [impl::SolverInterfaceImpl]:92 in configure: [0mConfiguring preCICE with configuration: "precice-config.xml"
+(0) 20:28:12 [impl::SolverInterfaceImpl]:134 in configure: [0mRun in coupling mode
+---[preciceAdapter] [DEBUG]   preCICE was configured.
+---[preciceAdapter] [DEBUG] Creating interfaces...
+---[preciceAdapter] [DEBUG] Number of face centres: 33
+---[preciceAdapter] [DEBUG] Interface created on mesh Fluid-Mesh-Faces
+---[preciceAdapter] [DEBUG] Adding coupling data writers...
+---[preciceAdapter] [DEBUG] Added writer: Force.
+---[preciceAdapter] [DEBUG] Adding coupling data readers...
+---[preciceAdapter] [DEBUG] Number of face nodes: 68
+---[preciceAdapter] [DEBUG] Interface created on mesh Fluid-Mesh-Nodes
+---[preciceAdapter] [DEBUG] Adding coupling data writers...
+---[preciceAdapter] [DEBUG] Adding coupling data readers...
+---[preciceAdapter] [DEBUG] Added reader: Displacement.
+---[preciceAdapter] [DEBUG] Initalizing the preCICE solver interface...
+(0) 20:28:12 [impl::SolverInterfaceImpl]:198 in initialize: [0mSetting up master communication to coupling partner/s 
+[0]PETSC ERROR: ------------------------------------------------------------------------
+[0]PETSC ERROR: Caught signal number 15 Terminate: Some process (or the batch system) has told this process to end
+[0]PETSC ERROR: Try option -start_in_debugger or -on_error_attach_debugger
+[0]PETSC ERROR: or see http://www.mcs.anl.gov/petsc/documentation/faq.html#valgrind
+[0]PETSC ERROR: or try http://valgrind.org on GNU/linux and Apple Mac OS X to find memory corruption errors
+[0]PETSC ERROR: configure using --with-debugging=yes, recompile, link, and run 
+[0]PETSC ERROR: to get more information on the crash.
+[0]PETSC ERROR: User provided function() line 0 in  unknown file  
