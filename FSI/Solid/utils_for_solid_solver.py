@@ -32,12 +32,51 @@ def give_gmsh_mesh(name):
     mesh = Mesh()
     hdf = HDF5File(mesh.mpi_comm(), name, 'r')
     hdf.read(mesh, '/mesh', False)
-    domains = MeshFunction('size_t', mesh, 2, mesh.domains())
-    hdf.read(domains, '/domains')
-    bndry = MeshFunction('size_t', mesh, 1)
-    hdf.read(bndry, '/bndry')    
+
+    # reads MeshFunctions
+    #domains = MeshFunction('size_t', mesh, 2, mesh.domains())
+    #hdf.read(domains, '/domains')
+    #bndry = MeshFunction('size_t', mesh, 1)
+    #hdf.read(bndry, '/bndry')    
+
+    # devide boundary into subdomains
+    class CouplingBoundary(SubDomain):
+        """
+        Determines if the point is at the coupling boundary
+
+        :func inside(): returns True if point belongs to the boundary, otherwise
+                    returns False
+        """
+        def inside(self, x, on_boundary):
+            tol = 1e-14
+            if on_boundary and (near(x[1], gY - 0.5*gEH) or near(x[1], gY + 0.5*gEH)
+                    or near(x[0], 0.6)):
+                return True
+            else:
+                return False
+
+    class ComplementaryBoundary(SubDomain):
+        """
+        Determines if a point is at the complementary boundary with tolerance of
+        1E-14.
+        :func inside(): returns True if point belongs to the boundary, otherwise
+                        returns False
+        """
+        def __init__(self, subdomain):
+            SubDomain.__init__(self)
+            self.complement = subdomain
+
+        def inside(self, x, on_boundary):
+            tol = 1E-14
+            if on_boundary and not self.complement.inside(x, on_boundary):
+                return True
+            else:
+                return False
+
+    coupling_boundary = CouplingBoundary()
+    complementary_boundary = ComplementaryBoundary(coupling_boundary)
     
-    return(mesh, bndry, domains, A)
+    return(mesh, coupling_boundary, complementary_boundary, A)
 
 def get_benchmark_specification(benchmark = 'CSM1'):
     if benchmark == 'CSM1':
@@ -55,10 +94,24 @@ def get_benchmark_specification(benchmark = 'CSM1'):
         nu_s = Constant(0.4)
         mu_s = Constant(5e05)
         result = "results-CSM3"	
+    elif benchmark == 'FSI1':
+        rho_s = Constant(1e03)
+        nu_s = Constant(0.4)
+        mu_s = Constant(5e05)
+        result = "results-FSI1"		
+    elif benchmark == 'FSI2':
+        rho_s = Constant(1e04)
+        nu_s = Constant(0.4)
+        mu_s = Constant(5e05)
+        result = "results-FSI2"		
+    elif benchmark == 'FSI3':
+        rho_s = Constant(1e03)
+        nu_s = Constant(0.4)
+        mu_s = Constant(2e06)
+        result = "results-FSI3"		
     else:
         raise ValueError('"{}" is a wrong name for problem specification.'.format(benchmark))
     E_s = Constant(2*mu_s*(1+nu_s))
-    #info('E_s = {}'.format(E_s.values()))
     lambda_s = Constant((nu_s*E_s)/((1+nu_s)*(1-2*nu_s)))
     g = Constant(2.0)
     return g, lambda_s, mu_s, rho_s, result

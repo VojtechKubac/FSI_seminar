@@ -25,14 +25,14 @@ parameters['ghost_mode'] = 'shared_facet'
 PETScOptions.set('mat_mumps_icntl_24', 1)	# detects null pivots
 PETScOptions.set('mat_mumps_cntl_1', 0.01)	# set treshold for partial treshold pivoting, 0.01 is default value
 
-# marks for boundary facets 
-_ZERO_DIRICHLET = 1
-_COUPLING       = 2
-
 class Solid(object):
-    def __init__(self, mesh, bndry, dt, theta, f, lambda_s, mu_s, rho_s, result, *args, **kwargs):
+    def __init__(self, mesh, coupling_boundary, complementary_boundary, dt, theta, f,
+            lambda_s, mu_s, rho_s, result, *args, **kwargs):
 
         self.mesh      = mesh
+        self.coupling_boundary = coupling_boundary
+        self.complementary_boundary = complementary_boundary
+
         self.fenics_dt = Constant(dt)
         self.theta     = theta
 
@@ -40,8 +40,6 @@ class Solid(object):
         self.mu_s     = mu_s
         self.rho_s    = rho_s
         
-        self.bndry = bndry
-
         # bounding box tree
         self.bb = BoundingBoxTree()
         self.bb.build(self.mesh)
@@ -56,7 +54,7 @@ class Solid(object):
         self.W = W
         self.U = FunctionSpace(self.mesh, eU)           # function space for exchanging BCs
 
-        bc_u = DirichletBC(self.W.sub(1), Constant((0.0, 0.0)), bndry, _ZERO_DIRICHLET)
+        bc_u = DirichletBC(self.W.sub(1), Constant((0.0, 0.0)), self.complementary_boundary)
         self.bcs = [bc_u]
 
         #info("Normal and Circumradius.")
@@ -91,7 +89,8 @@ class Solid(object):
         self.precice = Adapter()
         # read forces(Neumann condition for solid) and write displacement(Dirichlet condition for fluid)
         info('Call precice.initialize(...).')
-        self.precise_dt = self.precice.initialize(coupling_subdomain=coupling_boundary, mesh=self.mesh, 
+        self.precise_dt = self.precice.initialize(
+                coupling_subdomain=self.coupling_boundary, mesh=self.mesh, 
                 read_field=self.f_N_function, write_field=self.u_D_function, u_n=self.u_n)
 
         info('Mesh ID = {}'.format(self.precice.getMeshID("Mesh-Solid")))
@@ -203,31 +202,25 @@ else:
 sys.path.append('.')
 import utils_for_solid_solver as utils
 
-#(mesh, bndry, domains, interface, A, B) \
-#        = marker.give_marked_mesh(mesh_coarseness = mesh_coarseness, refinement = True, ALE = True)
-(mesh, bndry, domains, A) = utils.give_gmsh_mesh('Solid/Solid-Mesh.h5')
-
-# domain (used while building mesh) - needed for inflow condition
-gW = 0.41
+(mesh, coupling_boundary, complementary_boundary, A) = utils.give_gmsh_mesh('Solid/Solid-Mesh.h5')
 
 
 f, lambda_s, mu_s, rho_s, result = utils.get_benchmark_specification(benchmark)
 result = result
 
 
-solid = Solid(mesh, bndry, fenics_dt, theta, f, lambda_s, mu_s, rho_s, result)
-
-#dt = np.min([solid.fenics_dt, solid.precice_dt])
+solid = Solid(mesh, coupling_boundary, complementary_boundary, fenics_dt, theta, f, 
+        lambda_s, mu_s, rho_s, result)
 
 t = 0.0
 
+# start soling coupled problem, the final time is defined in precice-config.xml
 while solid.precice.is_coupling_ongoing():
     # compute solution
     t, n, precice_timestep_complete = solid.solve(t, n)
 
     if precice_time_step_complete:
         solid.save(t)
-
 
 solid.precice.finalize()
 
