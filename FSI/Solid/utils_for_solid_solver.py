@@ -32,6 +32,15 @@ def give_gmsh_mesh(name):
     mesh = Mesh()
     hdf = HDF5File(mesh.mpi_comm(), name, 'r')
     hdf.read(mesh, '/mesh', False)
+    print(type(mesh))
+
+    mesh = RectangleMesh(Point(0.2, 0.19), Point(0.6, 0.21), 10, 3)
+    print(type(mesh))
+
+    geometry = mshr.Rectangle(Point(0.2, 0.19), Point(0.6, 0.21))
+    #mesh = mshr.generate_mesh(geometry, 40)
+    #mesh.init()
+    #print(type(mesh))
 
     # reads MeshFunctions
     #domains = MeshFunction('size_t', mesh, 2, mesh.domains())

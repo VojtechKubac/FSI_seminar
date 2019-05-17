@@ -33,7 +33,8 @@ class Solid(object):
         self.coupling_boundary = coupling_boundary
         self.complementary_boundary = complementary_boundary
 
-        self.fenics_dt = Constant(dt)
+        self.fenics_dt = dt
+        self.dt = Constant(dt)
         self.theta     = theta
 
         self.lambda_s = lambda_s
@@ -43,6 +44,11 @@ class Solid(object):
         # bounding box tree
         self.bb = BoundingBoxTree()
         self.bb.build(self.mesh)
+
+        # create MeshFunction for boundary integrals
+        self.bndry = MeshFunction('size_t', self.mesh, 1)
+        self.bndry.set_all(0)
+        coupling_boundary.mark(self.bndry, 1)
 
         # Define finite elements
         eV = VectorElement("CG", mesh.ufl_cell(), 2)		# velocity space
@@ -86,18 +92,24 @@ class Solid(object):
 
         # start preCICE adapter
         info('Initialize Adapter.')
+        from pdb import set_trace as bp
+        #bp()
         self.precice = Adapter()
         # read forces(Neumann condition for solid) and write displacement(Dirichlet condition for fluid)
         info('Call precice.initialize(...).')
-        self.precise_dt = self.precice.initialize(
+        print(type(self.mesh), type(self.f_N_function), type(self.u_D_function), type(self.u_n))
+        self.precice_dt = self.precice.initialize(
                 coupling_subdomain=self.coupling_boundary, mesh=self.mesh, 
-                read_field=self.f_N_function, write_field=self.u_D_function, u_n=self.u_n)
+                read_field=self.f_N_function, write_field=self.u_D_function, u_n=self.u_n,
+                coupling_marker=self.bndry)
+        #self.precice_dt = 0.01
 
-        info('Mesh ID = {}'.format(self.precice.getMeshID("Mesh-Solid")))
+        #info('Mesh ID = {}'.format(self.precice.getMeshID("Mesh-Solid")))
 
-        self.dt = Constant(0.01)    # initial value that will be overwritten
-        self.dt.assign(np.min(self.precice_dt, self.fenics_dt))
+        info("set dt")
+        self.dt.assign(np.min([self.precice_dt, self.fenics_dt]))
 
+        info("define forms")
         # define deformation gradient, Jacobian
         self.FF  = I + grad(self.u)
         self.FF0 = I + grad(self.u0)
@@ -121,7 +133,8 @@ class Solid(object):
                    + inner(du - (self.theta*self.v + (1.0 - self.theta)*self.v0), u_)*dx
 
         # apply Neumann boundary condition on coupling interface
-        F += self.precice.create_coupling_neumann_condition(v_) 
+        info("coupling Neumann")
+        self.F_solid += self.precice.create_coupling_neumann_boundary_condition(v_, 1, self.W)
 
         self.dF_solid = derivative(self.F_solid, self.w)
 
@@ -145,6 +158,7 @@ class Solid(object):
         self.data = open(result+'/data.csv', 'w')
         self.writer = csv.writer(self.data, delimiter=';', lineterminator='\n')
         self.writer.writerow(['time', 'x-coordinate of end of beam', 'y-coordinate of end of beam'])
+        info("Solid __init__ done")
 
     def solve(self, t, n):
         self.t = t
@@ -159,7 +173,7 @@ class Solid(object):
 
         t, n, precice_timestep_complete, self.precice_dt \
                 = self.precice.advance(self.displacement, self.displacement, self.displacement0, 
-                        t, self.dt.values[0], n)
+                        t, self.dt.values()[0], n)
 
         self.w0.assign(self.w)
 
@@ -213,13 +227,14 @@ solid = Solid(mesh, coupling_boundary, complementary_boundary, fenics_dt, theta,
         lambda_s, mu_s, rho_s, result)
 
 t = 0.0
+n = 0
 
 # start soling coupled problem, the final time is defined in precice-config.xml
 while solid.precice.is_coupling_ongoing():
     # compute solution
     t, n, precice_timestep_complete = solid.solve(t, n)
 
-    if precice_time_step_complete:
+    if precice_timestep_complete:
         solid.save(t)
 
 solid.precice.finalize()
