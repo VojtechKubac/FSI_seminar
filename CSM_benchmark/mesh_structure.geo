@@ -15,19 +15,21 @@ Point(3) = {0.6-L_struct, 0.19+W_struct, 0., myhprecis};
 Point(4) = {cx-r, cy, 0., myhprecis};
 
 Point(5) = {0.6, 0.19, 0., myhprecis};
-Point(6) = {0.6, 0.19+W_struct, 0., myhprecis};
+Point(6) = {0.6, 0.2, 0., myhprecis};
+Point(7) = {0.6, 0.19+W_struct, 0., myhprecis};
 
 Line(1) = {2, 5};
 Line(2) = {5, 6};
-Line(3) = {6, 3};
+Line(3) = {6, 7};
+Line(4) = {7, 3};
 
 // surface structure
-Circle(4) = {3, 1, 2};
-Line Loop(10) = {3, 4, 1, 2};
+Circle(5) = {3, 1, 2};
+Line Loop(10) = {1, 2, 3, 4, 5};
 Plane Surface(1) = {10};
 
-Physical Line("1") = {4};            // Dirichlet
-Physical Line("2") = {1, 2, 3};      // rest
+Physical Line("1") = {5};            // Dirichlet
+Physical Line("2") = {1, 2, 3, 4};   // rest
 
 Physical Surface(1) = {1};         // solid
 
@@ -39,4 +41,3 @@ Mesh.Smoothing=100;
 Mesh.OptimizeNetgen=1;
 
 Mesh 2;
-

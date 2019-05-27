@@ -135,9 +135,11 @@ class Solid(object):
         # apply Neumann boundary condition on coupling interface
         info("coupling Neumann")
         self.F_solid += self.precice.create_coupling_neumann_boundary_condition(v_, 1, self.W)
+        #self.F_solid += self.precice.create_coupling_neumann_boundary_condition(v_, 1)
 
         self.dF_solid = derivative(self.F_solid, self.w)
 
+        info("set Problem.")
         self.problem = NonlinearVariationalProblem(self.F_solid, self.w, bcs=self.bcs, J=self.dF_solid)
         self.solver  = NonlinearVariationalSolver(self.problem)
 
