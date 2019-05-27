@@ -10,14 +10,12 @@ FoamFile
 
 solvers
 {
-
     p
     {
-            
-    solver           PCG;
-    preconditioner   DIC;
-    tolerance        1e-8;
-    relTol 	         1.0e-3;
+        solver           GAMG;
+        tolerance        1e-10;
+        relTol           1e-6;
+        smoother         DICGaussSeidel;
     }
 
     pFinal
@@ -26,14 +24,9 @@ solvers
         relTol          0;
     }
 
-    pcorr
-    {
-        $p;
-    }
-
     pcorrFinal
     {
-        $pcorr;
+        $p;
         relTol          0;
     }
 
@@ -46,9 +39,8 @@ solvers
     {
         solver          smoothSolver;
         smoother        symGaussSeidel;
-        tolerance       1e-6;
-        relTol          1e-4;
-        minIter         2;
+        tolerance       1e-10;
+        relTol          1e-6;
     }
 
     "(U|cellDisplacement)Final"
@@ -60,22 +52,38 @@ solvers
 
 PIMPLE
 {
-    nCorrectors 4;
-    nNonOrthogonalCorrectors 1;
-    // tolerance 1.0e-14;
-    // relTol 5e-3;
+    nCorrectors 2;
+    nNonOrthogonalCorrectors 0;
+    tolerance 1.0e-14;
+    relTol 5e-3;
+    pisoTol 1e-6;
     consistent  true;
-    correctPhi  true;
-    momentumPredictor true; 
-    nOuterCorrectors	1;
-}
 
+    nOuterCorrectors 50;
+
+    residualControl
+    {
+	//    U
+    	//{
+    	//	tolerance 5e-5;
+    	//	relTol	  0;
+    	//}
+	//    p
+    	//{
+    	//	tolerance 5e-4;
+    	//	relTol	  0;
+    	//}
+
+        U    5e-05;
+        p    5e-04;
+
+    }
+}
 
 potentialFlow
 {
-    nNonOrthogonalCorrectors 10;
+    nNonOrthogonalCorrectors 5;
 }
-
 
 
 // ************************************************************************* //

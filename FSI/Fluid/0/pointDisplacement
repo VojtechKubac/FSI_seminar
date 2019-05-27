@@ -25,23 +25,31 @@ boundaryField
         value           uniform (0 0 0);
     }
 
+    cylinder
+    {
+        type            fixedValue;
+        value           $internalField;
+    }
     flap
     {
         type            fixedValue;
         value           $internalField;
     }
     
-    upperWall
+    top
     {
         type            slip;
     }
 
-    lowerWall
+    bottom
     {
         type            slip;
     }
-
-    frontAndBack
+    front
+    {
+        type            empty;
+    }
+    back
     {
         type            empty;
     }

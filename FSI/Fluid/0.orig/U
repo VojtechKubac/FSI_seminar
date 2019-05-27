@@ -3,44 +3,63 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volVectorField;
-    location    "0";
     object      U;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform (10 0 0);
+internalField   uniform (0 0 0);
 
 boundaryField
 {
-    inlet
+
+    cylinder
     {
-        type            fixedValue;
-        value           $internalField;
-    }
-    outlet
-    {
-        type            zeroGradient;
-    }
+        type            noSlip;
+    }    
+
     flap
     {
         type            movingWallVelocity;
         value           uniform (0 0 0);
     }
-    upperWall
+
+    top
     {
         type            noSlip;
     }
-    lowerWall
+
+    bottom
     {
         type            noSlip;
     }
-    frontAndBack
+
+    inlet
+    {
+        // Time-varying inlet velocity
+        type            uniformFixedValue;
+        uniformValue    table 
+                        ( 
+                            ( 0 ( 0 0 0 ) ) 
+                            ( 2. ( 2. 0 0 ) ) 
+                            ( 100 ( 2. 0 0 ) ) 
+                        );
+    }
+
+    outlet
+    {
+        type            zeroGradient;
+    }
+
+    front
+    {
+        type            empty;
+    }
+    back
     {
         type            empty;
     }
 }
-
 
 // ************************************************************************* //

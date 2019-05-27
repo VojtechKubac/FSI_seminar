@@ -6,6 +6,7 @@ FoamFile
     location system;
     object decomposeParDict;
 }
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     numberOfSubdomains 6;
     
@@ -16,7 +17,7 @@ FoamFile
         delta 0.001;
         order xyz;
     }
-
+    
     distributed false;
     roots
     (

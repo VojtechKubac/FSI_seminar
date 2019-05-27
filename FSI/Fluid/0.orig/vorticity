@@ -2,49 +2,54 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       pointVectorField;
-    object      pointDisplacement;
+    class       volVectorField;
+    location    "0";
+    object      vorticity;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 1 0 0 0 0 0];
+dimensions      [0 0 -1 0 0 0 0];
 
 internalField   uniform (0 0 0);
 
 boundaryField
 {
+    cylinder
+    {
+        type            calculated;
+        value           uniform (0 0 0);
+    }
+    
+    flap
+    {
+        type            calculated;
+        value           uniform (0 0 0);
+    }
+
     inlet
     {
-        type            fixedValue;
+        type            calculated;
         value           uniform (0 0 0);
     }
 
     outlet
     {
-        type            fixedValue;
+        type            calculated;
         value           uniform (0 0 0);
     }
 
-    cylinder
-    {
-        type            fixedValue;
-        value           $internalField;
-    }
-    flap
-    {
-        type            fixedValue;
-        value           $internalField;
-    }
-    
     top
     {
-        type            slip;
+        type            calculated;
+        value           uniform (0 0 0);
     }
 
     bottom
     {
-        type            slip;
+        type            calculated;
+        value           uniform (0 0 0);
     }
+
     front
     {
         type            empty;
@@ -54,5 +59,6 @@ boundaryField
         type            empty;
     }
 }
+
 
 // ************************************************************************* //
