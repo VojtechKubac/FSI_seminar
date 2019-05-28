@@ -26,6 +26,7 @@ _FSI = 1
 _FLUID_CYLINDER = 2
 
 def give_gmsh_mesh(name):
+    name = name + '.h5'
     if not os.path.isfile(name):
         raise ValueError('Invalid name for gmsh mesh.')
 
@@ -60,5 +61,5 @@ def get_benchmark_specification(benchmark = 'CSM1'):
     E_s = Constant(2*mu_s*(1+nu_s))
     #info('E_s = {}'.format(E_s.values()))
     lambda_s = Constant((nu_s*E_s)/((1+nu_s)*(1-2*nu_s)))
-    g = Constant(2.0)
+    g = 2.0
     return g, lambda_s, mu_s, rho_s, result

@@ -6,11 +6,12 @@ import csv
 import sys
 import os.path
 from mpi4py.MPI import COMM_WORLD
+from optparse import OptionParser
 
-if __version__[:4] == '2018':
-    comm = MPI.comm_world
-else:
+if __version__[:4] == '2017':       # works with FEniCS 2017
     comm = mpi_comm_world()
+else:                               # works with FEniCS 2018, 2019
+    comm = MPI.comm_world
 my_rank = comm.Get_rank()
 
 # Use UFLACS to speed-up assembly and limit quadrature degree
@@ -26,12 +27,13 @@ PETScOptions.set('mat_mumps_cntl_1', 0.01)	# set treshold for partial treshold p
 
 
 class Structure(object):
-    def __init__(self, mesh, bndry, dt, theta, f, lambda_s, mu_s, rho_s, result, *args, **kwargs):
+    def __init__(self, mesh, bndry, dt, theta, g, lambda_s, mu_s, rho_s, result, *args, **kwargs):
 
         self.mesh  = mesh
         self.dt    = Constant(dt)
         self.theta = theta
         self.f     = Constant((0.0, f))
+        self.f     = Expression(( "0.0", "g"), g = Constant(g), degree=0)
 
         self.lambda_s = lambda_s
         self.mu_s     = mu_s
@@ -85,7 +87,7 @@ class Structure(object):
         S_s0 = self.FF0*(0.5*self.lambda_s*tr(B_s0 - I)*I + self.mu_s*(B_s0 - I))
 
         # write equation for solid
-        self.F_solid = rho_s*inner(dv, v_)*dx \
+        self.F_solid = self.rho_s*inner(dv, v_)*dx \
                    + self.theta*inner(S_s , grad(v_))*dx \
                    + (1.0 - self.theta)*inner(S_s0, grad(v_))*dx \
                    + inner(du - (self.theta*self.v + (1.0 - self.theta)*self.v0), u_)*dx \
@@ -146,29 +148,35 @@ class Structure(object):
 
 
 # time disretization
-theta = Constant(0.5)
-dt    = 0.01
 t_end = 10
 
-if len(sys.argv) > 1:
-    benchmark = str(sys.argv[1])
-else:
-    benchmark = 'CSM3'
+parser = OptionParser()
+parser.add_option("--mesh", dest="mesh_name", default='mesh_structure_L1')
+parser.add_option("--benchmark", dest="benchmark", default='CSM3')
+parser.add_option("--theta", dest="theta", default='0.5')
+parser.add_option("--dt", dest="dt", default='0.01')
+
+(options, args) = parser.parse_args()
+
+
+mesh_name = 'meshes/' + options.mesh_name   # name of the mesh to load
+benchmark = options.benchmark               # specifies benchmark specific material constants
+theta = float(options.theta)                # vlaue for theta schema used for time discretization
+dt = float(options.dt)                      # size of time step
 
 # load mesh with boundary and domain markers
 sys.path.append('.')
 import utils
+f, lambda_s, mu_s, rho_s, result = utils.get_benchmark_specification(benchmark)
+result = result + '/' + mesh_name[-2:]
 
 #(mesh, bndry, domains, interface, A, B) \
 #        = marker.give_marked_mesh(mesh_coarseness = mesh_coarseness, refinement = True, ALE = True)
-(mesh, bndry, domains, A) = utils.give_gmsh_mesh('mesh_structure.h5')
+(mesh, bndry, domains, A) = utils.give_gmsh_mesh(mesh_name)
 
 # domain (used while building mesh) - needed for inflow condition
 gW = 0.41
 
-
-f, lambda_s, mu_s, rho_s, result = utils.get_benchmark_specification(benchmark)
-result = result
 
 structure = Structure(mesh, bndry, dt, theta, f, lambda_s, mu_s, rho_s, result)
 

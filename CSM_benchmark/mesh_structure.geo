@@ -1,4 +1,4 @@
-h=0.03;
+h=0.06;
 myhext=h;
 //myhprecis=0.003;
 myhprecis=myhext/5.;
@@ -41,3 +41,10 @@ Mesh.Smoothing=100;
 Mesh.OptimizeNetgen=1;
 
 Mesh 2;
+
+If ( levels > 0 )
+For i In { 1 : levels }
+  RefineMesh;
+EndFor 
+EndIf
+
