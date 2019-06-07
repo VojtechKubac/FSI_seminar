@@ -5,7 +5,7 @@ SHELL=/bin/bash
 DIR:= meshes
 NAME:= mesh_structure
 
-all: $(NAME)_L0 $(NAME)_L1 $(NAME)_L2  # $(NAME)2D_ns_L3 $(NAME)2D_ns_L4
+all: $(NAME)_L0 $(NAME)_L1 $(NAME)_L2  $(NAME)_L3 $(NAME)_L4
 
 $(NAME)%: $(DIR)/$(NAME)%.h5
 	echo $< $@ $* $^

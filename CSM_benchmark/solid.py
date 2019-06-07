@@ -151,13 +151,12 @@ class Structure(object):
 t_end = 10
 
 parser = OptionParser()
-parser.add_option("--mesh", dest="mesh_name", default='mesh_structure_L1')
+parser.add_option("--mesh", dest="mesh_name", default='mesh_structure_L4')
 parser.add_option("--benchmark", dest="benchmark", default='CSM3')
 parser.add_option("--theta", dest="theta", default='0.5')
 parser.add_option("--dt", dest="dt", default='0.01')
 
 (options, args) = parser.parse_args()
-
 
 mesh_name = 'meshes/' + options.mesh_name   # name of the mesh to load
 benchmark = options.benchmark               # specifies benchmark specific material constants
@@ -168,7 +167,7 @@ dt = float(options.dt)                      # size of time step
 sys.path.append('.')
 import utils
 f, lambda_s, mu_s, rho_s, result = utils.get_benchmark_specification(benchmark)
-result = result + '/' + mesh_name[-2:]
+result = result + '/' + mesh_name[-2:] + '/' + str(dt)
 
 #(mesh, bndry, domains, interface, A, B) \
 #        = marker.give_marked_mesh(mesh_coarseness = mesh_coarseness, refinement = True, ALE = True)

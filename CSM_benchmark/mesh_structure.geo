@@ -1,4 +1,4 @@
-h=0.06;
+h=0.08;
 myhext=h;
 //myhprecis=0.003;
 myhprecis=myhext/5.;
