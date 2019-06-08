@@ -32,8 +32,7 @@ class Structure(object):
         self.mesh  = mesh
         self.dt    = Constant(dt)
         self.theta = theta
-        self.f     = Constant((0.0, f))
-        self.f     = Expression(( "0.0", "g"), g = Constant(g), degree=0)
+        self.f     = Expression(("0.0", "t>0.0? g : 0.0"), g = Constant(g), t = 0.0, degree=0)
 
         self.lambda_s = lambda_s
         self.mu_s     = mu_s
@@ -112,12 +111,13 @@ class Structure(object):
         self.vfile.parameters["flush_output"] = True
         self.ufile.parameters["flush_output"] = True
         self.sfile.parameters["flush_output"] = True
-        self.data = open(result+'/data.csv', 'w')
-        self.writer = csv.writer(self.data, delimiter=';', lineterminator='\n')
-        self.writer.writerow(['time', 'x-coordinate of end of beam', 'y-coordinate of end of beam'])
+        with open(result+'/data.csv', 'w') as data_file:
+            writer = csv.writer(data_file, delimiter=';', lineterminator='\n')
+            writer.writerow([ 'time', 'x-coordinate of end of beam', 'y-coordinate of end of beam'])
 
     def solve(self, t, dt):
         self.t = t
+        self.f.t = t
         self.dt = Constant(dt)
         self.solver.solve()
 
@@ -144,7 +144,9 @@ class Structure(object):
             Ay_loc = 0.0
         Ax = MPI.sum(comm, Ax_loc) / MPI.sum(comm, pi)
         Ay = MPI.sum(comm, Ay_loc) / MPI.sum(comm, pi)
-        self.writer.writerow([t, Ax, Ay])
+        with open(result+'/data.csv', 'a') as data_file:
+            writer = csv.writer(data_file, delimiter=';', lineterminator='\n')
+            writer.writerow([t, Ax, Ay])
 
 
 # time disretization
@@ -154,7 +156,7 @@ parser = OptionParser()
 parser.add_option("--mesh", dest="mesh_name", default='mesh_structure_L4')
 parser.add_option("--benchmark", dest="benchmark", default='CSM3')
 parser.add_option("--theta", dest="theta", default='0.5')
-parser.add_option("--dt", dest="dt", default='0.01')
+parser.add_option("--dt", dest="dt", default='0.02')
 
 (options, args) = parser.parse_args()
 
@@ -188,5 +190,3 @@ while  t < t_end:
     structure.save(t)
 
     t += float(dt)
-
-structure.data.close()
