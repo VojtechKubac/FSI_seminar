@@ -43,6 +43,7 @@
 
     <m2n:sockets from="Fluid" to="Solid" distribution-type="gather-scatter"/>
 
+<!-- 
     <coupling-scheme:serial-explicit>
         <timestep-length value="1e-2"/>
         <max-time value="5"/>
@@ -50,17 +51,17 @@
         <exchange data="Forces0" mesh="Solid-Mesh" from="Fluid" to="Solid"/>
         <exchange data="Displacements0" mesh="Solid-Mesh" from="Solid" to="Fluid"/>
     </coupling-scheme:serial-explicit>
+ -->
  
-<!-- 
     <coupling-scheme:serial-implicit>
-            <timestep-length value="1.e-2" />
+            <timestep-length value="1.e-02" />
             <max-time value="5."/>
             <participants first="Fluid" second="Solid"/>
             <exchange data="Forces0" mesh="Solid-Mesh" from="Fluid" to="Solid"/>
             <exchange data="Displacements0" mesh="Solid-Mesh" from="Solid" to="Fluid" />
 
             <max-iterations value="50"/>
-            <absolute-convergence-measure limit="1e-6" data="Displacements0" mesh="Solid-Mesh"/>
+            <absolute-convergence-measure limit="1e-4" data="Displacements0" mesh="Solid-Mesh"/>
             <relative-convergence-measure limit="1e-2" data="Forces0" mesh="Solid-Mesh"/>
             <extrapolation-order value="2"/>
  
@@ -74,7 +75,6 @@
             </post-processing:IQN-ILS> 
 
     </coupling-scheme:serial-implicit>
- -->
 
     </solver-interface>
 
