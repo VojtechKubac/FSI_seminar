@@ -61,7 +61,8 @@ class Solid(object):
         self.U = FunctionSpace(self.mesh, eU)           # function space for exchanging BCs
 
         bc_u = DirichletBC(self.W.sub(1), Constant((0.0, 0.0)), self.complementary_boundary)
-        self.bcs = [bc_u]
+        bc_v = DirichletBC(self.W.sub(0), Constant((0.0, 0.0)), self.complementary_boundary)
+        self.bcs = [bc_v, bc_u]
 
         #info("Normal and Circumradius.")
         self.n = FacetNormal(self.mesh)
@@ -97,7 +98,6 @@ class Solid(object):
         self.precice = Adapter()
         # read forces(Neumann condition for solid) and write displacement(Dirichlet condition for fluid)
         info('Call precice.initialize(...).')
-        print(type(self.mesh), type(self.f_N_function), type(self.u_D_function), type(self.u_n))
         self.precice_dt = self.precice.initialize(
                 coupling_subdomain=self.coupling_boundary, mesh=self.mesh, 
                 read_field=self.f_N_function, write_field=self.u_D_function, u_n=self.u_n,
@@ -134,7 +134,8 @@ class Solid(object):
 
         # apply Neumann boundary condition on coupling interface
         info("coupling Neumann")
-        self.F_solid += self.precice.create_coupling_neumann_boundary_condition(v_, 1, self.W)
+        self.F_solid += Constant(1.0)*self.precice.create_coupling_neumann_boundary_condition(v_, 1, self.U)
+        #self.F_solid += self.precice.create_coupling_neumann_boundary_condition(v_, 1, self.U)
         #self.F_solid += self.precice.create_coupling_neumann_boundary_condition(v_, 1)
 
         self.dF_solid = derivative(self.F_solid, self.w)
@@ -157,9 +158,9 @@ class Solid(object):
         self.vfile.parameters["flush_output"] = True
         self.ufile.parameters["flush_output"] = True
         self.sfile.parameters["flush_output"] = True
-        self.data = open(result+'/data.csv', 'w')
-        self.writer = csv.writer(self.data, delimiter=';', lineterminator='\n')
-        self.writer.writerow(['time', 'x-coordinate of end of beam', 'y-coordinate of end of beam'])
+        with open(result+'/data.csv', 'w') as data_file:
+            writer = csv.writer(data_file, delimiter=';', lineterminator='\n')
+            writer.writerow(['time', 'Ax_displacement', 'Ay_displacement'])
         info("Solid __init__ done")
 
     def solve(self, t, n):
@@ -178,6 +179,8 @@ class Solid(object):
                         t, self.dt.values()[0], n)
 
         self.w0.assign(self.w)
+
+        #print('precice_timestep_complete: ', precice_timestep_complete)
 
         return t, n, precice_timestep_complete
 
@@ -202,7 +205,9 @@ class Solid(object):
             Ay_loc = 0.0
         Ax = MPI.sum(comm, Ax_loc) / MPI.sum(comm, pi)
         Ay = MPI.sum(comm, Ay_loc) / MPI.sum(comm, pi)
-        self.writer.writerow([t, Ax, Ay])
+        with open(result+'/data.csv', 'a') as data_file:
+            writer = csv.writer(data_file, delimiter=';', lineterminator='\n')
+            writer.writerow([t, Ax, Ay])
 
 
 # time disretization
@@ -212,7 +217,7 @@ fenics_dt = 0.01
 if len(sys.argv) > 1:
     benchmark = str(sys.argv[1])
 else:
-    benchmark = 'CSM3'
+    benchmark = 'FSI2'
 
 # load mesh with boundary and domain markers
 sys.path.append('.')
@@ -236,9 +241,7 @@ while solid.precice.is_coupling_ongoing():
     # compute solution
     t, n, precice_timestep_complete = solid.solve(t, n)
 
-    if precice_timestep_complete:
+    if 1: #precice_timestep_complete:   # is allways False(!!!)
         solid.save(t)
 
 solid.precice.finalize()
-
-solid.data.close()
