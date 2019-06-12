@@ -241,7 +241,7 @@ while solid.precice.is_coupling_ongoing():
     # compute solution
     t, n, precice_timestep_complete = solid.solve(t, n)
 
-    if 1: #precice_timestep_complete:   # is allways False(!!!)
+    if precice_timestep_complete:   # is allways False(!!!)
         solid.save(t)
 
 solid.precice.finalize()
