@@ -46,7 +46,7 @@
 
     <coupling-scheme:serial-explicit>
         <timestep-length value="1e-2"/>
-        <max-time value="5"/>
+        <max-time value="15"/>
         <participants first="Fluid" second="Solid"/>
         <exchange data="Forces0" mesh="Solid-Mesh" from="Fluid" to="Solid"/>
         <exchange data="Displacements0" mesh="Solid-Mesh" from="Solid" to="Fluid"/>

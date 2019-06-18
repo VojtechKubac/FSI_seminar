@@ -46,4 +46,105 @@ functions
         type preciceAdapterFunctionObject;
         libs ("libpreciceAdapterFunctionObject.so");
     }
+//}
+
+    forces_flap
+    {
+       type    forces;
+       functionObjectLibs ("libforces.so");
+
+       //patches ( cylinder );
+       patches ( flap );
+       pName p;
+       UName U;
+
+       log   true;
+       CofR (0.2 0.2 0);
+       rho   rhoInf;
+       rhoInf 1;
+
+       outputControl timeStep;
+       outputInterval 1;
+
+    } 
+
+    forceCoefficients_flap
+    {
+       type    forceCoeffs;
+       functionObjectLibs ("libforces.so");
+       log yes;
+
+       outputControl timeStep;
+       outputInterval 10;
+
+       //patches ( cylinder );
+       patches ( flap );
+       pName p;
+       UName U;
+       rho   rhoInf;
+       rhoInf 1;
+    //   origin (0 0 0);
+
+     //  porosity   no;
+
+       liftDir (0 -1 0);
+       dragDir (1 0 0);
+       CofR    (0.2 0.2 0);  // Centre of cylinder
+       pitchAxis (0 0 1);
+
+       magUInf 0.2;  // 2*U/3 , where U = 0.3 m/s (inflow velocity)
+       rhoInf 1;
+       lRef 0.1;  // Dia of cylinder 0.1m
+       Aref 0.0001; // (Dia = 0.1) * (z-axis cylinder length = 0.01m)
+    }
+
+    forces_cylinder
+    {
+       type    forces;
+       functionObjectLibs ("libforces.so");
+
+       patches ( cylinder );
+       //patches ( flap );
+       pName p;
+       UName U;
+
+       log   true;
+       CofR (0.2 0.2 0);
+       rho   rhoInf;
+       rhoInf 1;
+
+       outputControl timeStep;
+       outputInterval 10;
+
+    } 
+
+    forceCoefficients_cylinder
+    {
+       type    forceCoeffs;
+       functionObjectLibs ("libforces.so");
+       log yes;
+
+       outputControl timeStep;
+       outputInterval 1;
+
+       patches ( cylinder );
+       //patches ( flap );
+       pName p;
+       UName U;
+       rho   rhoInf;
+       rhoInf 1;
+    //   origin (0 0 0);
+
+     //  porosity   no;
+
+       liftDir (0 -1 0);
+       dragDir (1 0 0);
+       CofR    (0.2 0.2 0);  // Centre of cylinder
+       pitchAxis (0 0 1);
+
+       magUInf 0.2;  // 2*U/3 , where U = 0.3 m/s (inflow velocity)
+       rhoInf 1;
+       lRef 0.1;  // Dia of cylinder 0.1m
+       Aref 0.0001; // (Dia = 0.1) * (z-axis cylinder length = 0.01m)
+    }
 }

@@ -26,7 +26,7 @@ PETScOptions.set('mat_mumps_icntl_24', 1)	# detects null pivots
 PETScOptions.set('mat_mumps_cntl_1', 0.01)	# set treshold for partial treshold pivoting, 0.01 is default value
 
 class Solid(object):
-    def __init__(self, mesh, coupling_boundary, complementary_boundary, dt, theta, f,
+    def __init__(self, mesh, coupling_boundary, complementary_boundary, bndry, dt, theta,
             lambda_s, mu_s, rho_s, result, *args, **kwargs):
 
         self.mesh      = mesh
@@ -41,19 +41,15 @@ class Solid(object):
         self.mu_s     = mu_s
         self.rho_s    = rho_s
         
+        self.bndry = bndry
+
         # bounding box tree
         self.bb = BoundingBoxTree()
         self.bb.build(self.mesh)
 
-        # create MeshFunction for boundary integrals
-        self.bndry = MeshFunction('size_t', self.mesh, 1)
-        self.bndry.set_all(0)
-        coupling_boundary.mark(self.bndry, 1)
-
         # Define finite elements
         eV = VectorElement("CG", mesh.ufl_cell(), 2)		# velocity space
         eU = VectorElement("CG", mesh.ufl_cell(), 2)		# displacement space
-        eB = VectorElement("Bubble", mesh.ufl_cell(), mesh.geometry().dim()+1) # Bubble element
 
         eW = MixedElement([eV, eU])			# function space
         W  = FunctionSpace(self.mesh, eW)
@@ -126,17 +122,22 @@ class Solid(object):
         S_s  = self.FF *(0.5*self.lambda_s*tr(B_s  - I)*I + self.mu_s*(B_s  - I))
         S_s0 = self.FF0*(0.5*self.lambda_s*tr(B_s0 - I)*I + self.mu_s*(B_s0 - I))
 
+        self.f_surface = self.precice.create_coupling_neumann_boundary_condition(v_, 1, self.U)
+        #self.f_surface = Function(self.U)
+
         # write equation for solid
         self.F_solid = rho_s*inner(dv, v_)*dx \
                    + self.theta*inner(S_s , grad(v_))*dx \
                    + (1.0 - self.theta)*inner(S_s0, grad(v_))*dx \
-                   + inner(du - (self.theta*self.v + (1.0 - self.theta)*self.v0), u_)*dx
+                   + inner(du - (self.theta*self.v + (1.0 - self.theta)*self.v0), u_)*dx \
+                   + inner(self.f_surface, v_)*dss(1)
 
         # apply Neumann boundary condition on coupling interface
         info("coupling Neumann")
-        self.F_solid += Constant(1.0)*self.precice.create_coupling_neumann_boundary_condition(v_, 1, self.U)
+        #self.F_neumann += self.precice.create_coupling_neumann_boundary_condition(v_, 1, self.U)
         #self.F_solid += self.precice.create_coupling_neumann_boundary_condition(v_, 1, self.U)
-        #self.F_solid += self.precice.create_coupling_neumann_boundary_condition(v_, 1)
+
+        #self.F_solid += self.F_neumann
 
         self.dF_solid = derivative(self.F_solid, self.w)
 
@@ -160,7 +161,7 @@ class Solid(object):
         self.sfile.parameters["flush_output"] = True
         with open(result+'/data.csv', 'w') as data_file:
             writer = csv.writer(data_file, delimiter=';', lineterminator='\n')
-            writer.writerow(['time', 'Ax_displacement', 'Ay_displacement'])
+            writer.writerow(['time', 'Ax_displacement', 'Ay_displacement', 'lift', 'drag'])
         info("Solid __init__ done")
 
     def solve(self, t, n):
@@ -205,9 +206,17 @@ class Solid(object):
             Ay_loc = 0.0
         Ax = MPI.sum(comm, Ax_loc) / MPI.sum(comm, pi)
         Ay = MPI.sum(comm, Ay_loc) / MPI.sum(comm, pi)
+
+        # evaluate forces (lift and drag)
+        drag = -assemble(self.f_surface[0]*dss(1))
+        lift = -assemble(self.f_surface[1]*dss(1))
+
         with open(result+'/data.csv', 'a') as data_file:
             writer = csv.writer(data_file, delimiter=';', lineterminator='\n')
-            writer.writerow([t, Ax, Ay])
+            writer.writerow([t, Ax, Ay, lift, drag])
+
+        info(' Ax: {}\n Ay: {} \n lift: {} \n drag: {}'.format(
+            Ax, Ay, lift, drag))
 
 
 # time disretization
@@ -225,12 +234,19 @@ import utils_for_solid_solver as utils
 
 (mesh, coupling_boundary, complementary_boundary, A) = utils.give_gmsh_mesh('Solid/Solid-Mesh.h5')
 
+# create MeshFunction for boundary integrals
+bndry = MeshFunction('size_t', mesh, 1)
+bndry.set_all(0)
+coupling_boundary.mark(bndry, 1)
+
+dss = Measure('ds', domain=mesh, subdomain_data=bndry)
+
 
 f, lambda_s, mu_s, rho_s, result = utils.get_benchmark_specification(benchmark)
 result = result
 
 
-solid = Solid(mesh, coupling_boundary, complementary_boundary, fenics_dt, theta, f, 
+solid = Solid(mesh, coupling_boundary, complementary_boundary, bndry, fenics_dt, theta,
         lambda_s, mu_s, rho_s, result)
 
 t = 0.0
@@ -241,7 +257,7 @@ while solid.precice.is_coupling_ongoing():
     # compute solution
     t, n, precice_timestep_complete = solid.solve(t, n)
 
-    if precice_timestep_complete:   # is allways False(!!!)
+    if precice_timestep_complete: 
         solid.save(t)
 
 solid.precice.finalize()

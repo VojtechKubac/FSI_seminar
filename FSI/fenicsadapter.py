@@ -336,7 +336,15 @@ class Adapter:
             self._coupling_bc_expression = CustomExpression(element=self._function_space.ufl_element()) # elemnt information must be provided, else DOLFIN assumes scalar function
         except (TypeError, KeyError):  # works with dolfin 2017.2.0
             self._coupling_bc_expression = CustomExpression(element=self._function_space.ufl_element(),degree=0)
-        self._coupling_bc_expression.set_boundary_data(self._read_data, x_vert, y_vert)
+
+        #self._coupling_bc_expression.set_boundary_data(self._read_data, x_vert, y_vert)
+
+        # MY_HACK
+        delta_W = 0.01  # width of OpenFOAM domain in z-direction
+        #self._coupling_bc_expression.set_boundary_data(delta_W * self._read_data, x_vert, y_vert)
+        self._coupling_bc_expression.set_boundary_data(0.0000100 * self._read_data, x_vert, y_vert)
+        #print(type(self._coupling_bc_expression))
+        #self._coupling_bc_expression = 1.0/delta_W *self._coupling_bc_expression
 
     def create_coupling_dirichlet_boundary_condition(self, function_space):
         """Creates the coupling Dirichlet boundary conditions using
@@ -385,7 +393,11 @@ class Adapter:
 
             #print(type(self._coupling_bc_expression))
             #print(type(test_functions))
-            return dot(self._coupling_bc_expression, test_functions) * self.dss(boundary_marker)
+            #return dot(self._coupling_bc_expression, test_functions) * self.dss(boundary_marker)
+
+            # MY_HACK
+            # want to have the force force in my FEniCS code
+            return self._coupling_bc_expression
 
     def advance(self, write_function, u_np1, u_n, t, dt, n):
         """Calls preCICE advance function using precice and manages checkpointing.
