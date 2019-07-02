@@ -4,9 +4,9 @@ import mshr
 import numpy as np
 import csv
 import sys
-import os.path
 from mpi4py.MPI import COMM_WORLD
 from fenicsadapter import Adapter
+import os.path
 
 if __version__[:4] == '2017':
     comm = mpi_comm_world()
@@ -75,7 +75,7 @@ class Solid(object):
         # define coupling BCs
         self.u_D = Constant((0.0, 0.0))                     # Dirichlet BC (for Fluid)
         self.u_D_function = interpolate(self.u_D, self.U)   # Dirichlet BC as function
-        self.f_N = Constant((0.0, 0.0))                     # Neumann BC (for solid)
+        self.f_N = Constant((0.0, 0.0))                     # Neumann BC (for Solid)
         self.f_N_function = interpolate(self.f_N, self.U)   # Neumann BC as function
 
         # initial value of Dirichlet BC
@@ -83,46 +83,47 @@ class Solid(object):
 
         # create self.displacement function for exchanging BCs
         self.displacement  = Function(self.U)
-        self.displacement0 = Function(self.U)
+        #self.displacement0 = Function(self.U)
         self.displacement.assign(project(self.u, self.U))
         self.displacement.rename("Displacement", "")
 
         # start preCICE adapter
         info('Initialize Adapter.')
-        from pdb import set_trace as bp
-        #bp()
         self.precice = Adapter()
         # read forces(Neumann condition for solid) and write displacement(Dirichlet condition for fluid)
         info('Call precice.initialize(...).')
         self.precice_dt = self.precice.initialize(
                 coupling_subdomain=self.coupling_boundary, mesh=self.mesh, 
-                read_field=self.f_N_function, write_field=self.u_D_function, u_n=self.u_n,
+                read_field=self.f_N_function, write_field=self.u_D_function, u_n=self.w,#u_n,
                 coupling_marker=self.bndry)
         #self.precice_dt = 0.01
 
         #info('Mesh ID = {}'.format(self.precice.getMeshID("Mesh-Solid")))
 
-        info("set dt")
+        #info("set dt")
         self.dt.assign(np.min([self.precice_dt, self.fenics_dt]))
 
-        info("define forms")
+        #info("define forms")
         # define deformation gradient, Jacobian
         self.FF  = I + grad(self.u)
         self.FF0 = I + grad(self.u0)
-        self.JJ  = det(self.FF)
-        self.JJ0 = det(self.FF0)
 
         # approximate time derivatives
         du = (1.0/self.dt)*(self.u - self.u0)
         dv = (1.0/self.dt)*(self.v - self.v0)
 
         # compute 1st Piola-Kirchhoff tensor for solid (St. Vennant - Kirchhoff model)
-        B_s  = self.FF.T *self.FF
-        B_s0 = self.FF0.T*self.FF0
-        S_s  = self.FF *(0.5*self.lambda_s*tr(B_s  - I)*I + self.mu_s*(B_s  - I))
-        S_s0 = self.FF0*(0.5*self.lambda_s*tr(B_s0 - I)*I + self.mu_s*(B_s0 - I))
+        E_s  = self.FF.T *self.FF  - I
+        E_s0 = self.FF0.T*self.FF0 - I
+        #E_s  = 2*sym(grad(self.u))
+        #E_s0 = 2*sym(grad(self.u0))
 
-        self.f_surface = self.precice.create_coupling_neumann_boundary_condition(v_, 1, self.U)
+        S_s  = self.FF *(0.5*self.lambda_s*tr(E_s )*I + self.mu_s*(E_s ))
+        S_s0 = self.FF0*(0.5*self.lambda_s*tr(E_s0)*I + self.mu_s*(E_s0))
+
+        delta_W = 0.01
+        alpha = Constant(1.0) # Constant(1.0/delta_W) # Constant(1000)
+        self.f_surface = alpha*self.precice.create_coupling_neumann_boundary_condition(v_, 1, self.U)
         #self.f_surface = Function(self.U)
 
         # write equation for solid
@@ -133,7 +134,7 @@ class Solid(object):
                    + inner(self.f_surface, v_)*dss(1)
 
         # apply Neumann boundary condition on coupling interface
-        info("coupling Neumann")
+        #info("coupling Neumann")
         #self.F_neumann += self.precice.create_coupling_neumann_boundary_condition(v_, 1, self.U)
         #self.F_solid += self.precice.create_coupling_neumann_boundary_condition(v_, 1, self.U)
 
@@ -141,13 +142,14 @@ class Solid(object):
 
         self.dF_solid = derivative(self.F_solid, self.w)
 
-        info("set Problem.")
+        #info("set Problem.")
         self.problem = NonlinearVariationalProblem(self.F_solid, self.w, bcs=self.bcs, J=self.dF_solid)
         self.solver  = NonlinearVariationalSolver(self.problem)
 
         # configure solver parameters
         self.solver.parameters['newton_solver']['relative_tolerance'] = 1e-6
-        self.solver.parameters['newton_solver']['maximum_iterations'] = 15
+        self.solver.parameters['newton_solver']['absolute_tolerance'] = 1e-10
+        self.solver.parameters['newton_solver']['maximum_iterations'] = 50
         self.solver.parameters['newton_solver']['linear_solver']      = 'mumps'
 
         # create files for saving
@@ -171,15 +173,18 @@ class Solid(object):
         # solve problem
         self.solver.solve()
 
+        (v, u) = split(self.w)
+
         # update displacement
-        self.displacement0.assign(self.displacement)
-        self.displacement.assign(project(self.u, self.U))
+        self.displacement.assign(project(u, self.U))
+        #self.displacement0.assign(self.displacement)
+        #self.displacement.assign(project(self.u, self.U))
 
         t, n, precice_timestep_complete, self.precice_dt \
-                = self.precice.advance(self.displacement, self.displacement, self.displacement0, 
+                = self.precice.advance(self.displacement, self.w, self.w0,#self.displacement, self.displacement0, 
                         t, self.dt.values()[0], n)
 
-        self.w0.assign(self.w)
+        #self.w0.assign(self.w)
 
         #print('precice_timestep_complete: ', precice_timestep_complete)
 
@@ -218,10 +223,12 @@ class Solid(object):
         info(' Ax: {}\n Ay: {} \n lift: {} \n drag: {}'.format(
             Ax, Ay, lift, drag))
 
+        #self.w0.assign(self.w)
+        #self.displacement0.assign(project(self.u0, self.U))
 
 # time disretization
 theta    = Constant(0.5)
-fenics_dt = 0.01
+fenics_dt = 0.001
 
 if len(sys.argv) > 1:
     benchmark = str(sys.argv[1])
@@ -233,6 +240,7 @@ sys.path.append('.')
 import utils_for_solid_solver as utils
 
 (mesh, coupling_boundary, complementary_boundary, A) = utils.give_gmsh_mesh('Solid/Solid-Mesh.h5')
+#(mesh, coupling_boundary, complementary_boundary, A) = utils.give_gmsh_mesh('../CSM_benchmark/meshes/mesh_structure_L3.h5')
 
 # create MeshFunction for boundary integrals
 bndry = MeshFunction('size_t', mesh, 1)

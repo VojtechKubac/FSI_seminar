@@ -13,8 +13,8 @@ solvers
     p
     {
         solver           GAMG;
-        tolerance        1e-6;
-        relTol           1e-4;
+        tolerance        1e-10;
+        relTol           1e-6;
         smoother         DICGaussSeidel;
     }
 
@@ -39,8 +39,8 @@ solvers
     {
         solver          smoothSolver;
         smoother        symGaussSeidel;
-        tolerance       1e-6;
-        relTol          1e-4;
+        tolerance       1e-10;
+        relTol          1e-6;
     }
 
     "(U|cellDisplacement)Final"
