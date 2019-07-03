@@ -173,13 +173,15 @@ class Solid(object):
         # solve problem
         self.solver.solve()
 
-        (v, u) = split(self.w)
+        # extract velocity v and displacement u from mixed vector w
+        (v, u) = self.w.split()
 
-        # update displacement
+        # update displacement (Dirichlet BC for fluid)
         self.displacement.assign(project(u, self.U))
         #self.displacement0.assign(self.displacement)
         #self.displacement.assign(project(self.u, self.U))
 
+        # precice coupling step
         t, n, precice_timestep_complete, self.precice_dt \
                 = self.precice.advance(self.displacement, self.w, self.w0,#self.displacement, self.displacement0, 
                         t, self.dt.values()[0], n)
@@ -193,16 +195,19 @@ class Solid(object):
     def save(self, t):
         (v, u) = self.w.split()
 
+        # save velocity and displacement
         v.rename("v", "velocity")
         u.rename("u", "displacement")
         self.vfile.write(v, t)
         self.ufile.write(u, t)
 
+        # extract values of displacament in point A = (0.6, 0.2)
         self.w.set_allow_extrapolation(True)
         Ax_loc = self.u[0]((A.x(), A.y()))
         Ay_loc = self.u[1]((A.x(), A.y()))
         self.w.set_allow_extrapolation(False)
         
+        # MPI stuff in case of more processes
         pi = 0
         if self.bb.compute_first_collision(A) < 4294967295:
             pi = 1
@@ -216,6 +221,7 @@ class Solid(object):
         drag = -assemble(self.f_surface[0]*dss(1))
         lift = -assemble(self.f_surface[1]*dss(1))
 
+        # write displacement and forces to file
         with open(result+'/data.csv', 'a') as data_file:
             writer = csv.writer(data_file, delimiter=';', lineterminator='\n')
             writer.writerow([t, Ax, Ay, lift, drag])
@@ -247,7 +253,7 @@ bndry = MeshFunction('size_t', mesh, 1)
 bndry.set_all(0)
 coupling_boundary.mark(bndry, 1)
 
-dss = Measure('ds', domain=mesh, subdomain_data=bndry)
+dss = Measure('ds', domain=mesh, subdomain_data=bndry)        # surface measure for integral over coupling boundary
 
 
 f, lambda_s, mu_s, rho_s, result = utils.get_benchmark_specification(benchmark)
