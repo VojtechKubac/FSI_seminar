@@ -112,14 +112,14 @@ class Solid(object):
         du = (1.0/self.dt)*(self.u - self.u0)
         dv = (1.0/self.dt)*(self.v - self.v0)
 
-        # compute 1st Piola-Kirchhoff tensor for solid (St. Vennant - Kirchhoff model)
-        E_s  = self.FF.T *self.FF  - I
-        E_s0 = self.FF0.T*self.FF0 - I
+        # compute 1st Piola-Kirchhoff tensor for solid (St. Venant - Kirchhoff model)
+        E_s  = 0.5*(self.FF.T *self.FF  - I)
+        E_s0 = 0.5*(self.FF0.T*self.FF0 - I)
         #E_s  = 2*sym(grad(self.u))
         #E_s0 = 2*sym(grad(self.u0))
 
-        S_s  = self.FF *(0.5*self.lambda_s*tr(E_s )*I + self.mu_s*(E_s ))
-        S_s0 = self.FF0*(0.5*self.lambda_s*tr(E_s0)*I + self.mu_s*(E_s0))
+        S_s  = self.FF *(self.lambda_s*tr(E_s )*I + 2.0*self.mu_s*(E_s ))
+        S_s0 = self.FF0*(self.lambda_s*tr(E_s0)*I + 2.0*self.mu_s*(E_s0))
 
         delta_W = 0.01
         alpha = Constant(1.0) # Constant(1.0/delta_W) # Constant(1000)
