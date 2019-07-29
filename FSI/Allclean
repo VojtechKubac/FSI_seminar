@@ -56,5 +56,8 @@ rm -fv \
 
 rm -fv .*.address
 
+echo "Deleting vtk files..."
+rm -f *vtk
+
 echo "Cleaning complete!"
 #------------------------------------------------------------------------------

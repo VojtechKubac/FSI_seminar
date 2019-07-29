@@ -1,3 +1,7 @@
+"""
+This library takes care about mesh processing and the choice of problem-specific constants
+for the code solid.py
+"""
 from dolfin import *
 from dolfin import __version__
 import mshr

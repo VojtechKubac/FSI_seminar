@@ -30,7 +30,7 @@
         <use-mesh name="Solid-Mesh" from="Solid"/>
         <write-data name="Forces0" mesh="Fluid-Mesh-Faces"/>
         <read-data name="Displacements0" mesh="Fluid-Mesh-Nodes"/>
-        <mapping:petrbf-thin-plate-splines direction="write" from="Fluid-Mesh-Faces" to="Solid-Mesh" constraint="conservative" y-dead="true" />
+        <mapping:petrbf-thin-plate-splines direction="write" from="Fluid-Mesh-Faces" to="Solid-Mesh" constraint="conservative" z-dead="true" />
         <mapping:petrbf-thin-plate-splines direction="read" from="Solid-Mesh" to="Fluid-Mesh-Nodes" constraint="consistent" />
 	<!--
         <mapping:nearest-neighbor direction="write" from="Fluid-Mesh-Faces" to="Solid-Mesh" constraint="conservative" />

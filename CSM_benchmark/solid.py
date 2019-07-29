@@ -1,3 +1,15 @@
+"""
+Solid elasticity code for elastic beam under influence of volume force. 
+
+Solves CSM3 benchmark from 
+    "Turek and J. Hron, “Proposal for numerical benchmarking of fluid–
+     structure interaction between an elastic object and laminar incompress-
+     ible flow,” in Fluid-Structure Interaction - Modelling, Simulation, Opti-
+     mization, ser. Lecture Notes in Computational Science and Engineering,"
+
+Written by Vojtech Kubac.
+"""
+
 from dolfin import *
 from dolfin import __version__
 import mshr

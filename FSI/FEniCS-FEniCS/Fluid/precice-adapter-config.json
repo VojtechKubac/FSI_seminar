@@ -1,0 +1,9 @@
+{
+  "solver_name": "Fluid",
+  "config_file_name": "precice-config.xml",
+  "interface": {
+      "coupling_mesh_name": "Fluid-Mesh",
+      "write_data_name": "Forces0",
+      "read_data_name": "Displacements0"
+    }
+}

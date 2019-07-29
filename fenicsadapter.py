@@ -122,7 +122,7 @@ class Adapter:
         self._solver_name = self._config.get_solver_name()
 
         self._interface = precice.Interface(self._solver_name, 0, 1)
-        self._interface.configure(self._config.get_config_file_name())
+        self._interface.configure(self._config.get_config_file_name()) # raises error
         self._dimensions = self._interface.get_dimensions()
 
         self._coupling_subdomain = None # initialized later
@@ -322,12 +322,12 @@ class Adapter:
             self._coupling_bc_expression = CustomExpression(element=self._function_space.ufl_element()) # elemnt information must be provided, else DOLFIN assumes scalar function
         except (TypeError, KeyError):  # works with dolfin 2017.2.0
             self._coupling_bc_expression = CustomExpression(element=self._function_space.ufl_element(),degree=0)
-        #self._coupling_bc_expression.set_boundary_data(self._read_data, x_vert, y_vert)
+        self._coupling_bc_expression.set_boundary_data(self._read_data, x_vert, y_vert)
 
         # MY_CHANGE
-        delta_W = 0.01  # width of OpenFOAM domain in z-direction
+        #delta_W = 0.01  # width of OpenFOAM domain in z-direction
         #self._coupling_bc_expression.set_boundary_data(delta_W * self._read_data, x_vert, y_vert)
-        self._coupling_bc_expression.set_boundary_data(self._read_data/delta_W, x_vert, y_vert)
+        #self._coupling_bc_expression.set_boundary_data(self._read_data/delta_W, x_vert, y_vert)
         #print(type(self._coupling_bc_expression))
         #self._coupling_bc_expression = 1.0/delta_W *self._coupling_bc_expression
 
@@ -339,7 +339,8 @@ class Adapter:
         """
         self._function_space = function_space
         self.create_coupling_boundary_condition()
-        return dolfin.DirichletBC(self._function_space, self._coupling_bc_expression, self._coupling_subdomain)
+        #return dolfin.DirichletBC(self._function_space, self._coupling_bc_expression, self._coupling_subdomain)
+        return self._coupling_bc_expression
 
     def create_coupling_neumann_boundary_condition(self, test_functions, boundary_marker=None,
             function_space=None):
@@ -444,11 +445,13 @@ class Adapter:
             n = self._n_cp
             self._interface.fulfilled_action(precice.action_read_iteration_checkpoint())
         else:
+            #print('Update w0')
             u_n.assign(u_np1)
             t = new_t = t + dt  # todo the variables new_t, new_n could be saved, by just using t and n below, however I think it improved readability.
             n = new_n = n + 1
 
         if self._interface.is_action_required(precice.action_write_iteration_checkpoint()):
+            #print('Update checkpoint')
             # continue FEniCS computation with u_np1
             # update checkpoint
             self._u_cp.assign(u_np1)
@@ -477,11 +480,13 @@ class Adapter:
         
         self._function_type = self.function_type(write_field)
         
+        print('is action required')
         if self._interface.is_action_required(precice.action_write_initial_data()):
             self.write_block_data()
                 
         self._interface.initialize_data()
 
+        print('read available')
         if self._interface.is_read_data_available():
             self.read_block_data()
 #            if self.function_type(read_field) is FunctionType.SCALAR:

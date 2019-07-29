@@ -1,3 +1,6 @@
+"""
+Mesh processing procedures for the code solid.py
+"""
 from dolfin import *
 from dolfin import __version__
 import mshr
