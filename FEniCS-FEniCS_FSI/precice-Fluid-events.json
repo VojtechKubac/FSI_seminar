@@ -1,0 +1,361 @@
+{
+  "Finalized": "2019-08-02T10:22:03.266",
+  "Initialized": "2019-08-02T10:21:57.045",
+  "Name": "",
+  "Ranks": [
+    {
+      "Finalized": "2019-08-02T10:22:03.266",
+      "Initialized": "2019-08-02T10:21:57.045",
+      "StateChanges": [
+        {
+          "Name": "_GLOBAL",
+          "State": 1,
+          "Timestamp": 0
+        },
+        {
+          "Name": "_GLOBAL",
+          "State": 0,
+          "Timestamp": 6220
+        },
+        {
+          "Name": "configure",
+          "State": 1,
+          "Timestamp": 0
+        },
+        {
+          "Name": "configure",
+          "State": 0,
+          "Timestamp": 0
+        },
+        {
+          "Name": "initialize",
+          "State": 1,
+          "Timestamp": 38
+        },
+        {
+          "Name": "initialize",
+          "State": 0,
+          "Timestamp": 83
+        },
+        {
+          "Name": "initialize/m2n.requestMasterConnection",
+          "State": 1,
+          "Timestamp": 38
+        },
+        {
+          "Name": "initialize/m2n.requestMasterConnection",
+          "State": 0,
+          "Timestamp": 38
+        },
+        {
+          "Name": "initialize/m2n.requestSlavesConnection",
+          "State": 1,
+          "Timestamp": 83
+        },
+        {
+          "Name": "initialize/m2n.requestSlavesConnection",
+          "State": 0,
+          "Timestamp": 83
+        },
+        {
+          "Name": "initialize/partition.feedbackMesh.Fluid-Mesh",
+          "State": 1,
+          "Timestamp": 83
+        },
+        {
+          "Name": "initialize/partition.feedbackMesh.Fluid-Mesh",
+          "State": 0,
+          "Timestamp": 83
+        },
+        {
+          "Name": "initialize/partition.receiveGlobalMesh.Solid-Mesh",
+          "State": 1,
+          "Timestamp": 38
+        },
+        {
+          "Name": "initialize/partition.receiveGlobalMesh.Solid-Mesh",
+          "State": 0,
+          "Timestamp": 83
+        },
+        {
+          "Name": "initializeData",
+          "State": 1,
+          "Timestamp": 83
+        },
+        {
+          "Name": "initializeData",
+          "State": 0,
+          "Timestamp": 122
+        },
+        {
+          "Name": "initializeData/map.pet.computeMapping.FromFluid-MeshToSolid-Mesh",
+          "State": 1,
+          "Timestamp": 83
+        },
+        {
+          "Name": "initializeData/map.pet.computeMapping.FromFluid-MeshToSolid-Mesh",
+          "State": 0,
+          "Timestamp": 110
+        },
+        {
+          "Name": "initializeData/map.pet.computeRescaling.FromFluid-MeshToSolid-Mesh",
+          "State": 1,
+          "Timestamp": 95
+        },
+        {
+          "Name": "initializeData/map.pet.computeRescaling.FromFluid-MeshToSolid-Mesh",
+          "State": 0,
+          "Timestamp": 110
+        },
+        {
+          "Name": "initializeData/map.pet.fillA.FromFluid-MeshToSolid-Mesh",
+          "State": 1,
+          "Timestamp": 92
+        },
+        {
+          "Name": "initializeData/map.pet.fillA.FromFluid-MeshToSolid-Mesh",
+          "State": 0,
+          "Timestamp": 95
+        },
+        {
+          "Name": "initializeData/map.pet.fillC.FromFluid-MeshToSolid-Mesh",
+          "State": 1,
+          "Timestamp": 87
+        },
+        {
+          "Name": "initializeData/map.pet.fillC.FromFluid-MeshToSolid-Mesh",
+          "State": 0,
+          "Timestamp": 90
+        },
+        {
+          "Name": "initializeData/map.pet.mapData.FromFluid-MeshToSolid-Mesh",
+          "State": 1,
+          "Timestamp": 110
+        },
+        {
+          "Name": "initializeData/map.pet.mapData.FromFluid-MeshToSolid-Mesh",
+          "State": 0,
+          "Timestamp": 111
+        },
+        {
+          "Name": "initializeData/map.pet.postFill.FromFluid-MeshToSolid-Mesh",
+          "State": 1,
+          "Timestamp": 95
+        },
+        {
+          "Name": "initializeData/map.pet.postFill.FromFluid-MeshToSolid-Mesh",
+          "State": 0,
+          "Timestamp": 95
+        },
+        {
+          "Name": "initializeData/map.pet.preallocA.FromFluid-MeshToSolid-Mesh",
+          "State": 1,
+          "Timestamp": 90
+        },
+        {
+          "Name": "initializeData/map.pet.preallocA.FromFluid-MeshToSolid-Mesh",
+          "State": 0,
+          "Timestamp": 92
+        },
+        {
+          "Name": "initializeData/map.pet.preallocC.FromFluid-MeshToSolid-Mesh",
+          "State": 1,
+          "Timestamp": 83
+        },
+        {
+          "Name": "initializeData/map.pet.preallocC.FromFluid-MeshToSolid-Mesh",
+          "State": 0,
+          "Timestamp": 87
+        },
+        {
+          "Name": "initializeData/map.pet.solverInit.FromFluid-MeshToSolid-Mesh",
+          "State": 1,
+          "Timestamp": 95
+        },
+        {
+          "Name": "initializeData/map.pet.solverInit.FromFluid-MeshToSolid-Mesh",
+          "State": 0,
+          "Timestamp": 95
+        },
+        {
+          "Name": "solver.initialize",
+          "State": 1,
+          "Timestamp": 0
+        },
+        {
+          "Name": "solver.initialize",
+          "State": 2,
+          "Timestamp": 38
+        },
+        {
+          "Name": "solver.initialize",
+          "State": 1,
+          "Timestamp": 83
+        },
+        {
+          "Name": "solver.initialize",
+          "State": 2,
+          "Timestamp": 83
+        },
+        {
+          "Name": "solver.initialize",
+          "State": 1,
+          "Timestamp": 122
+        },
+        {
+          "Name": "solver.initialize",
+          "State": 0,
+          "Timestamp": 6220
+        }
+      ],
+      "Timings": {
+        "_GLOBAL": {
+          "Count": 1,
+          "Data": [],
+          "Max": 6220,
+          "Min": 6220,
+          "TimeRatio": 1.0,
+          "Total": 6220
+        },
+        "configure": {
+          "Count": 1,
+          "Data": [],
+          "Max": 0,
+          "Min": 0,
+          "TimeRatio": 0.0,
+          "Total": 0
+        },
+        "initialize": {
+          "Count": 1,
+          "Data": [],
+          "Max": 45,
+          "Min": 45,
+          "TimeRatio": 0.007234726688102894,
+          "Total": 45
+        },
+        "initialize/m2n.requestMasterConnection": {
+          "Count": 1,
+          "Data": [],
+          "Max": 0,
+          "Min": 0,
+          "TimeRatio": 0.0,
+          "Total": 0
+        },
+        "initialize/m2n.requestSlavesConnection": {
+          "Count": 1,
+          "Data": [],
+          "Max": 0,
+          "Min": 0,
+          "TimeRatio": 0.0,
+          "Total": 0
+        },
+        "initialize/partition.feedbackMesh.Fluid-Mesh": {
+          "Count": 1,
+          "Data": [],
+          "Max": 0,
+          "Min": 0,
+          "TimeRatio": 0.0,
+          "Total": 0
+        },
+        "initialize/partition.receiveGlobalMesh.Solid-Mesh": {
+          "Count": 1,
+          "Data": [],
+          "Max": 44,
+          "Min": 44,
+          "TimeRatio": 0.00707395498392283,
+          "Total": 44
+        },
+        "initializeData": {
+          "Count": 1,
+          "Data": [],
+          "Max": 38,
+          "Min": 38,
+          "TimeRatio": 0.006109324758842444,
+          "Total": 38
+        },
+        "initializeData/map.pet.computeMapping.FromFluid-MeshToSolid-Mesh": {
+          "Count": 1,
+          "Data": [],
+          "Max": 26,
+          "Min": 26,
+          "TimeRatio": 0.004180064308681672,
+          "Total": 26
+        },
+        "initializeData/map.pet.computeRescaling.FromFluid-MeshToSolid-Mesh": {
+          "Count": 1,
+          "Data": [
+            107
+          ],
+          "Max": 14,
+          "Min": 14,
+          "TimeRatio": 0.0022508038585209,
+          "Total": 14
+        },
+        "initializeData/map.pet.fillA.FromFluid-MeshToSolid-Mesh": {
+          "Count": 1,
+          "Data": [],
+          "Max": 2,
+          "Min": 2,
+          "TimeRatio": 0.0003215434083601286,
+          "Total": 2
+        },
+        "initializeData/map.pet.fillC.FromFluid-MeshToSolid-Mesh": {
+          "Count": 1,
+          "Data": [],
+          "Max": 3,
+          "Min": 3,
+          "TimeRatio": 0.0004823151125401929,
+          "Total": 3
+        },
+        "initializeData/map.pet.mapData.FromFluid-MeshToSolid-Mesh": {
+          "Count": 1,
+          "Data": [],
+          "Max": 0,
+          "Min": 0,
+          "TimeRatio": 0.0,
+          "Total": 0
+        },
+        "initializeData/map.pet.postFill.FromFluid-MeshToSolid-Mesh": {
+          "Count": 1,
+          "Data": [],
+          "Max": 0,
+          "Min": 0,
+          "TimeRatio": 0.0,
+          "Total": 0
+        },
+        "initializeData/map.pet.preallocA.FromFluid-MeshToSolid-Mesh": {
+          "Count": 1,
+          "Data": [],
+          "Max": 2,
+          "Min": 2,
+          "TimeRatio": 0.0003215434083601286,
+          "Total": 2
+        },
+        "initializeData/map.pet.preallocC.FromFluid-MeshToSolid-Mesh": {
+          "Count": 1,
+          "Data": [],
+          "Max": 3,
+          "Min": 3,
+          "TimeRatio": 0.0004823151125401929,
+          "Total": 3
+        },
+        "initializeData/map.pet.solverInit.FromFluid-MeshToSolid-Mesh": {
+          "Count": 1,
+          "Data": [],
+          "Max": 0,
+          "Min": 0,
+          "TimeRatio": 0.0,
+          "Total": 0
+        },
+        "solver.initialize": {
+          "Count": 1,
+          "Data": [],
+          "Max": 6136,
+          "Min": 6136,
+          "TimeRatio": 0.9864951768488746,
+          "Total": 6136
+        }
+      }
+    }
+  ]
+}

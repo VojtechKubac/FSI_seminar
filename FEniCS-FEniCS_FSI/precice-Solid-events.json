@@ -1,11 +1,11 @@
 {
-  "Finalized": "2019-07-21T17:08:22.106",
-  "Initialized": "2019-07-21T17:08:16.297",
+  "Finalized": "2019-08-02T10:22:03.281",
+  "Initialized": "2019-08-02T10:19:46.055",
   "Name": "",
   "Ranks": [
     {
-      "Finalized": "2019-07-21T17:08:22.106",
-      "Initialized": "2019-07-21T17:08:16.297",
+      "Finalized": "2019-08-02T10:22:03.281",
+      "Initialized": "2019-08-02T10:19:46.055",
       "StateChanges": [
         {
           "Name": "_GLOBAL",
@@ -15,7 +15,7 @@
         {
           "Name": "_GLOBAL",
           "State": 0,
-          "Timestamp": 5809
+          "Timestamp": 137226
         },
         {
           "Name": "configure",
@@ -30,52 +30,52 @@
         {
           "Name": "initialize/m2n.acceptMasterConnection",
           "State": 1,
-          "Timestamp": 7
+          "Timestamp": 8
         },
         {
           "Name": "initialize/m2n.acceptMasterConnection",
           "State": 0,
-          "Timestamp": 181
+          "Timestamp": 131029
         },
         {
           "Name": "initialize/m2n.acceptSlavesConnection",
           "State": 1,
-          "Timestamp": 182
+          "Timestamp": 131029
         },
         {
           "Name": "initialize/m2n.acceptSlavesConnection",
           "State": 0,
-          "Timestamp": 182
+          "Timestamp": 131029
         },
         {
           "Name": "initialize/partition.feedbackMesh.Solid-Mesh",
           "State": 1,
-          "Timestamp": 182
+          "Timestamp": 131029
         },
         {
           "Name": "initialize/partition.feedbackMesh.Solid-Mesh",
           "State": 0,
-          "Timestamp": 182
+          "Timestamp": 131029
         },
         {
           "Name": "initialize/partition.gatherMesh.Solid-Mesh",
           "State": 1,
-          "Timestamp": 181
+          "Timestamp": 131029
         },
         {
           "Name": "initialize/partition.gatherMesh.Solid-Mesh",
           "State": 0,
-          "Timestamp": 182
+          "Timestamp": 131029
         },
         {
           "Name": "initialize/partition.sendGlobalMesh.Solid-Mesh",
           "State": 1,
-          "Timestamp": 182
+          "Timestamp": 131029
         },
         {
           "Name": "initialize/partition.sendGlobalMesh.Solid-Mesh",
           "State": 0,
-          "Timestamp": 182
+          "Timestamp": 131029
         },
         {
           "Name": "solver.initialize",
@@ -85,22 +85,22 @@
         {
           "Name": "solver.initialize",
           "State": 2,
-          "Timestamp": 7
+          "Timestamp": 8
         },
         {
           "Name": "solver.initialize",
           "State": 0,
-          "Timestamp": 5809
+          "Timestamp": 137226
         }
       ],
       "Timings": {
         "_GLOBAL": {
           "Count": 1,
           "Data": [],
-          "Max": 5809,
-          "Min": 5809,
+          "Max": 137226,
+          "Min": 137226,
           "TimeRatio": 1.0,
-          "Total": 5809
+          "Total": 137226
         },
         "configure": {
           "Count": 1,
@@ -113,10 +113,10 @@
         "initialize/m2n.acceptMasterConnection": {
           "Count": 1,
           "Data": [],
-          "Max": 173,
-          "Min": 173,
-          "TimeRatio": 0.029781373730418316,
-          "Total": 173
+          "Max": 131021,
+          "Min": 131021,
+          "TimeRatio": 0.9547826213691283,
+          "Total": 131021
         },
         "initialize/m2n.acceptSlavesConnection": {
           "Count": 1,
@@ -153,10 +153,10 @@
         "solver.initialize": {
           "Count": 1,
           "Data": [],
-          "Max": 7,
-          "Min": 7,
-          "TimeRatio": 0.0012050266827336891,
-          "Total": 7
+          "Max": 8,
+          "Min": 8,
+          "TimeRatio": 5.8297990176788654e-05,
+          "Total": 8
         }
       }
     }
